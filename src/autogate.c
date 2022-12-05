@@ -247,8 +247,8 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
 #ifdef DEBUG
     windowId = XPLMCreateWindow(10, 750, 310, 610, 1, drawdebug, NULL, NULL, NULL);
 #endif
-    //--- XPLMRegisterFlightLoopCallback(initsoundcallback, -1, NULL);	/* Deferred initialisation */
-    //--- XPLMRegisterFlightLoopCallback(alertcallback, 0, NULL);
+    XPLMRegisterFlightLoopCallback(initsoundcallback, -1, NULL);	/* Deferred initialisation */
+    XPLMRegisterFlightLoopCallback(alertcallback, 0, NULL);
     XPLMRegisterFlightLoopCallback(newplanecallback, 0, NULL);		/* For checking gate alignment on new location */
 
     return 1;
@@ -258,9 +258,9 @@ PLUGIN_API void XPluginStop(void)
 {
     if (windowId) XPLMDestroyWindow(windowId);
     XPLMUnregisterFlightLoopCallback(newplanecallback, NULL);
-    //--- XPLMUnregisterFlightLoopCallback(alertcallback, NULL);
-    //--- XPLMUnregisterFlightLoopCallback(initsoundcallback, NULL);
-    //--- closesound();
+    XPLMUnregisterFlightLoopCallback(alertcallback, NULL);
+    XPLMUnregisterFlightLoopCallback(initsoundcallback, NULL);
+    closesound();
 }
 
 PLUGIN_API int XPluginEnable(void)

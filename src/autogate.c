@@ -184,17 +184,19 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
     /* Refuse to initialise if Fat plugin has been moved out of its folder */
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);			/* Get paths in posix format under X-Plane 10+ */
     XPLMGetPluginInfo(XPLMGetMyID(), NULL, buffer, NULL, NULL);
-#if 0
     posixify(buffer);
+    xplog(buffer);
     if ((c = strrchr(buffer, '/')))
     {
-        if (!strcmp(c-3, "/32") || !strcmp(c-3, "/64"))
+        *c ='\0';
+        if (!strcmp(c-3, "/64"))
             *(c-3) = '\0';		/* plugins one level down on some builds, so go up */
-        else
-            *c = '\0';			/* strip .xpl file */
+
+        xplog(buffer);
         if ((c = strrchr(buffer, '/')))
             *c = '\0';			/* strip Fat plugin folder */
-    }
+        xplog(buffer);
+ }
     if (!c ||
         !(c = strrchr(buffer, '/')) ||
         strcasecmp(c, "/plugins"))
@@ -202,7 +204,6 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
         XPLMDebugString("AutoGate: Can't initialise - plugin has been moved out of its folder!\n");
         return 0;
     }
-#endif
 
     /* Datarefs */
     ref_plane_x        =XPLMFindDataRef("sim/flightmodel/position/local_x");

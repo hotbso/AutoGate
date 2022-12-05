@@ -8,12 +8,10 @@
 
 #include "autogate.h"
 
-#if 0
-#if IBM
+#ifdef _MSC_VER
 #  include <windows.h>
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason, LPVOID lpReserved)
 { return TRUE; }
-#endif
 #endif
 
 /* Globals */
@@ -174,6 +172,8 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
     sprintf(outName, "%s v%s", pluginName, VERSION);
     strcpy(outSig,  pluginSig);
     strcpy(outDesc, pluginDesc);
+
+    xplog("startup v" VERSION);
 
     /* Refuse to initialise if Fat plugin has been moved out of its folder */
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);			/* Get paths in posix format under X-Plane 10+ */

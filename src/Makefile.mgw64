@@ -33,8 +33,8 @@ clean:
 
 # install the just compiled target
 install: $(TARGET)
-	mkdir -p "$(PLUGDIR)/win_x64"
-	cp -p $(TARGET) "$(PLUGDIR)/win_x64/AutoGate.xpl"
+	mkdir -p "$(PLUGDIR)/64"
+	cp -p $(TARGET) "$(PLUGDIR)/64/"
 
 # create the whole plugin directory
 plugin: $(TARGET)

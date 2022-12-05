@@ -8,16 +8,21 @@
 
 #include "autogate.h"
 
+#if 0
 #if IBM
 #  include <windows.h>
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason, LPVOID lpReserved)
 { return TRUE; }
 #endif
+#endif
 
+void playalert(void) {}
+void stopalert(void) {}
+XPLMDataRef ref_audio, ref_paused, ref_view_external;
 
 /* Globals */
 static const char pluginName[]="AutoGate";
-static const char pluginSig[] ="Marginal.AutoGate";
+static const char pluginSig[] ="Marginal.AutoGate-hotbso";
 static const char pluginDesc[]="Manages boarding bridges and DGSs";
 
 static XPLMWindowID windowId = NULL;
@@ -177,6 +182,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
     /* Refuse to initialise if Fat plugin has been moved out of its folder */
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);			/* Get paths in posix format under X-Plane 10+ */
     XPLMGetPluginInfo(XPLMGetMyID(), NULL, buffer, NULL, NULL);
+#if 0
     posixify(buffer);
     if ((c = strrchr(buffer, '/')))
     {
@@ -194,6 +200,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
         XPLMDebugString("AutoGate: Can't initialise - plugin has been moved out of its folder!\n");
         return 0;
     }
+#endif
 
     /* Datarefs */
     ref_plane_x        =XPLMFindDataRef("sim/flightmodel/position/local_x");
@@ -238,8 +245,8 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
 #ifdef DEBUG
     windowId = XPLMCreateWindow(10, 750, 310, 610, 1, drawdebug, NULL, NULL, NULL);
 #endif
-    XPLMRegisterFlightLoopCallback(initsoundcallback, -1, NULL);	/* Deferred initialisation */
-    XPLMRegisterFlightLoopCallback(alertcallback, 0, NULL);
+    //--- XPLMRegisterFlightLoopCallback(initsoundcallback, -1, NULL);	/* Deferred initialisation */
+    //--- XPLMRegisterFlightLoopCallback(alertcallback, 0, NULL);
     XPLMRegisterFlightLoopCallback(newplanecallback, 0, NULL);		/* For checking gate alignment on new location */
 
     return 1;
@@ -249,9 +256,9 @@ PLUGIN_API void XPluginStop(void)
 {
     if (windowId) XPLMDestroyWindow(windowId);
     XPLMUnregisterFlightLoopCallback(newplanecallback, NULL);
-    XPLMUnregisterFlightLoopCallback(alertcallback, NULL);
-    XPLMUnregisterFlightLoopCallback(initsoundcallback, NULL);
-    closesound();
+    //--- XPLMUnregisterFlightLoopCallback(alertcallback, NULL);
+    //--- XPLMUnregisterFlightLoopCallback(initsoundcallback, NULL);
+    //--- closesound();
 }
 
 PLUGIN_API int XPluginEnable(void)

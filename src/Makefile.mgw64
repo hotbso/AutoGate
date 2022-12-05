@@ -1,0 +1,43 @@
+.SUFFIXES: .obj
+
+include ..\version.mak
+
+TARGET=win.xpl
+HEADERS=$(wildcard *.h)
+SOURCES=$(wildcard *.c)
+SOURCES=autogate.c
+OBJECTS=$(SOURCES:.c=.o)
+SDK=../../SDK
+OPENAL=../..
+PLUGDIR=/e/X-Plane-12/Resources/plugins/AutoGate
+
+CC=x86_64-w64-mingw32-gcc
+LD=x86_64-w64-mingw32-gcc
+
+CFLAGS+=-mdll -g0 -O2 -s -Wall -fdiagnostics-color -Wno-format-overflow -DWINDOWS -DWIN32 \
+	-I$(SDK)/CHeaders/XPLM -I$(SDK)/CHeaders/Widgets -I$(OPENAL)/include -DIBM=1 -DVERSION=$(VERSION)
+
+LDFLAGS=-shared -static-libgcc -static -lpthread
+LIBS=-L$(SDK)/Libraries/Win -lXPLM_64 -lXPWidgets_64
+
+
+all: $(TARGET)
+
+.c.obj:
+	$(CC) $(CFLAGS) -c $<
+	
+$(TARGET): $(OBJECTS)
+	$(LD) -o $(TARGET) $(LDFLAGS) $(OBJECTS) $(LIBS)
+
+clean:
+	rm $(OBJECTS) $(TARGET)
+
+# install the just compiled target
+install: $(TARGET)
+	mkdir -p "$(PLUGDIR)/win_x64"
+	cp -p $(TARGET) "$(PLUGDIR)/win_x64/AutoGate.xpl"
+
+# create the whole plugin directory
+plugin: $(TARGET)
+	mkdir -p "$(PLUGDIR)/64"
+	cp -p $(TARGET) "$(PLUGDIR)/64"

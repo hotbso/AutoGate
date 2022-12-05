@@ -24,7 +24,6 @@
 #  define strcasecmp(s1, s2) _stricmp(s1, s2)
 #endif
 
-#if 0
 #if APL
 #  include <OpenAL/al.h>
 #  include <OpenAL/alc.h>
@@ -32,10 +31,9 @@
 #  include <AL/al.h>
 #  include <AL/alc.h>
 #endif
-#endif
 
 #define XPLM200	/* Requires X-Plane 9.0 or later */
-//#include "XPLMCamera.h"
+#include "XPLMCamera.h"
 #include "XPLMDataAccess.h"
 #include "XPLMDisplay.h"
 #include "XPLMGraphics.h"

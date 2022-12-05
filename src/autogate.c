@@ -16,9 +16,11 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason, LPVOID lpReserved)
 #endif
 #endif
 
+#if 0
 void playalert(void) {}
 void stopalert(void) {}
 XPLMDataRef ref_audio, ref_paused, ref_view_external;
+#endif
 
 /* Globals */
 static const char pluginName[]="AutoGate";

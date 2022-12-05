@@ -5,20 +5,19 @@ include ..\version.mak
 TARGET=win.xpl
 HEADERS=$(wildcard *.h)
 SOURCES=$(wildcard *.c)
-SOURCES=autogate.c
+#SOURCES=autogate.c
 OBJECTS=$(SOURCES:.c=.o)
 SDK=../../SDK
-OPENAL=../..
 PLUGDIR=/e/X-Plane-12/Resources/plugins/AutoGate
 
 CC=x86_64-w64-mingw32-gcc
 LD=x86_64-w64-mingw32-gcc
 
 CFLAGS+=-mdll -g0 -O2 -s -Wall -fdiagnostics-color -Wno-format-overflow -DWINDOWS -DWIN32 \
-	-I$(SDK)/CHeaders/XPLM -I$(SDK)/CHeaders/Widgets -I$(OPENAL)/include -DIBM=1 -DVERSION=$(VERSION)
+	-I. -I$(SDK)/CHeaders/XPLM -I$(SDK)/CHeaders/Widgets -DIBM=1 -DVERSION=$(VERSION)
 
 LDFLAGS=-shared -static-libgcc -static -lpthread
-LIBS=-L$(SDK)/Libraries/Win -lXPLM_64 -lXPWidgets_64
+LIBS= -L./ -lopenal32 -L$(SDK)/Libraries/Win -lXPLM_64 -lXPWidgets_64
 
 
 all: $(TARGET)

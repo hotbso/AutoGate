@@ -16,12 +16,6 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason, LPVOID lpReserved)
 #endif
 #endif
 
-#if 0
-void playalert(void) {}
-void stopalert(void) {}
-XPLMDataRef ref_audio, ref_paused, ref_view_external;
-#endif
-
 /* Globals */
 static const char pluginName[]="AutoGate";
 static const char pluginSig[] ="Marginal.AutoGate-hotbso";
@@ -177,7 +171,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
 {
     char buffer[PATH_MAX], *c;
 
-    sprintf(outName, "%s v%.2f", pluginName, VERSION);
+    sprintf(outName, "%s v%s", pluginName, VERSION);
     strcpy(outSig,  pluginSig);
     strcpy(outDesc, pluginDesc);
 
@@ -185,17 +179,14 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);			/* Get paths in posix format under X-Plane 10+ */
     XPLMGetPluginInfo(XPLMGetMyID(), NULL, buffer, NULL, NULL);
     posixify(buffer);
-    xplog(buffer);
     if ((c = strrchr(buffer, '/')))
     {
         *c ='\0';
         if (!strcmp(c-3, "/64"))
             *(c-3) = '\0';		/* plugins one level down on some builds, so go up */
 
-        xplog(buffer);
         if ((c = strrchr(buffer, '/')))
             *c = '\0';			/* strip Fat plugin folder */
-        xplog(buffer);
  }
     if (!c ||
         !(c = strrchr(buffer, '/')) ||

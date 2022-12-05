@@ -1,8 +1,8 @@
 /*
  * AutoGate
- * 
+ *
  * (c) Jonathan Harris 2006-2013
- * 
+ *
  * Licensed under GNU LGPL v2.1.
  */
 
@@ -27,7 +27,7 @@ static float door_x, door_y, door_z;		/* door offset relative to ref point */
 
 /* Datarefs */
 static XPLMDataRef ref_plane_x, ref_plane_y, ref_plane_z, ref_plane_psi;
-static XPLMDataRef ref_ENGN_running, ref_parkingbrake;
+static XPLMDataRef ref_ENGN_running, ref_parkingbrake, ref_beacon;
 static XPLMDataRef ref_draw_object_x, ref_draw_object_y, ref_draw_object_z, ref_draw_object_psi;
 static XPLMDataRef ref_acf_descrip, ref_acf_icao;
 static XPLMDataRef ref_acf_cg_y, ref_acf_cg_z;
@@ -203,6 +203,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
     ref_plane_psi      =XPLMFindDataRef("sim/flightmodel/position/psi");
     ref_ENGN_running   =XPLMFindDataRef("sim/flightmodel/engine/ENGN_running");
     ref_parkingbrake   =XPLMFindDataRef("sim/flightmodel/controls/parkbrake");
+    ref_beacon         =XPLMFindDataRef("sim/cockpit2/switches/beacon_on");
     ref_draw_object_x  =XPLMFindDataRef("sim/graphics/animation/draw_object_x");
     ref_draw_object_y  =XPLMFindDataRef("sim/graphics/animation/draw_object_y");
     ref_draw_object_z  =XPLMFindDataRef("sim/graphics/animation/draw_object_z");
@@ -366,7 +367,7 @@ static float getgatefloat(XPLMDataRef inRefcon)
     float plane_x, plane_z;
     float object_x, object_y, object_z, object_h;
     float local_x, local_y, local_z;
-	
+
     now = XPLMGetDataf(ref_total_running_time_sec);
     object_x = XPLMGetDataf(ref_draw_object_x);
     object_y = XPLMGetDataf(ref_draw_object_y);
@@ -441,6 +442,7 @@ static float getgatefloat(XPLMDataRef inRefcon)
 
             XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
             running |= (XPLMGetDataf(ref_parkingbrake) < 0.5f);
+            running |= XPLMGetDatai(ref_beacon);
             state = running ? TRACK : DOCKED;
         }
         else if (!door_x)
@@ -599,9 +601,10 @@ static void updaterefs(float now, float local_x, float local_y, float local_z)
 {
     int running;
     int locgood=(fabsf(local_x)<=AZI_X && fabsf(local_z)<=GOOD_Z);
-	
+
     XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
     running |= (XPLMGetDataf(ref_parkingbrake) < 0.5f);
+    running |= XPLMGetDatai(ref_beacon);
 
     status=id1=id2=id3=id4=lr=track=0;
     azimuth=distance=distance2=0;
@@ -775,7 +778,7 @@ static XPLMDataRef intarrayref(char *inDataName, XPLMGetDatavi_f inReadIntArray,
 {
     return XPLMRegisterDataAccessor(inDataName, xplmType_IntArray, 0, NULL, NULL, NULL, NULL, NULL, NULL, inReadIntArray, NULL, NULL, NULL, NULL, NULL, inRefcon, 0);
 }
-	
+
 
 /* Log to Log.txt. Returns 0 because that's a failure return code from most XP entry points */
 int xplog(char *msg)
@@ -824,5 +827,5 @@ static void drawdebug(XPLMWindowID inWindowID, void *inRefcon)
     alGetSourcefv(snd_src, AL_GAIN, &gain);
     sprintf(buf, "Sound: %10.3f %10.3f %10.3f %6.2f", pos[0], pos[1], pos[2], gain);
     XPLMDrawString(color, left + 5, top -130, buf, 0, xplmFont_Basic);
-}				    
+}
 #endif

@@ -305,7 +305,6 @@ float initsoundcallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLa
     *(c+1)='\0';
     if (!strcmp(c-3, "/64/")) { *(c-2)='\0'; }	/* plugins one level down on some builds, so go up */
     strcat(buffer, "alert.wav");
-    XPLMDebugString(buffer);
     if (!(snd_buffer = load_wave(buffer))) return 0;
     CHECKERR("Can't buffer sound data.");
 

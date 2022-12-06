@@ -13,7 +13,7 @@ PLUGDIR=/e/X-Plane-12/Resources/plugins/AutoGate
 CC=x86_64-w64-mingw32-gcc
 LD=x86_64-w64-mingw32-gcc
 
-CFLAGS+=-mdll -g0 -O2 -s -Wall -fdiagnostics-color -Wno-format-overflow -DWINDOWS -DWIN32 \
+override CFLAGS+=-mdll -g0 -O2 -s -Wall -fdiagnostics-color -Wno-format-overflow -DWINDOWS -DWIN32 \
 	-I$(OPENAL) -I$(SDK)/CHeaders/XPLM -I$(SDK)/CHeaders/Widgets -DIBM=1 -DVERSION=\"$(VERSION)\"
 
 LDFLAGS=-shared -static-libgcc -static -lpthread

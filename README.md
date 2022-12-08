@@ -1,7 +1,7 @@
 # AutoGate animated jetway and docking guidance system kit
 
 ### Note
-This a a fork of the original AutoGate 1.72 that was abondandoned 2017 with changes to make in usable on XP12.
+This a a fork of the original AutoGate 1.72 that was abandoned 2017 with changes to make in usable on XP12.
 So the main goal is to just compile the plugin code for XP12.
 
 The only verified working part of the build system is *../src/Makefile.mgw64* for the mingw64 system on Windows.

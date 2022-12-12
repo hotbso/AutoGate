@@ -28,6 +28,5 @@ clean:
 	rm -f $(OBJECTS) $(LACFU_OBJECTS) $(TARGET)
 
 install: $(TARGET)
-	cp -p $(TARGET) $(PLUGINS)/.
 	cp -p $(TARGET) $(PLUGINS)/64/.
         

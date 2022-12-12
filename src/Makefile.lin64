@@ -1,0 +1,33 @@
+PLUGINS=../../X-Plane/Resources/plugins/AutoGate
+SDK=../../SDK
+
+include ../version.mak
+
+TARGET=lin.xpl
+HEADERS=$(wildcard *.h)
+SOURCES=$(wildcard *.c)
+OBJECTS=$(SOURCES:.c=.o)
+
+CFLAGS=-Wall -I$(SDK)/CHeaders/XPLM -fPIC -DLIN=1 -fno-stack-protector \
+       -DVERSION=\"$(VERSION)\"
+
+
+LNFLAGS=-shared -rdynamic -nodefaultlibs -undefined_warning
+LIBS=-lopenal
+#-fvisibility=hidden -Wl,-exported_symbols_list -Wl,linkscript.mac
+
+all: $(TARGET)
+
+.c.o:$(HEADERS)
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $(TARGET) $(LNFLAGS) $(OBJECTS) $(LIBS)
+
+clean:
+	rm -f $(OBJECTS) $(LACFU_OBJECTS) $(TARGET)
+
+install: $(TARGET)
+	cp -p $(TARGET) $(PLUGINS)/.
+	cp -p $(TARGET) $(PLUGINS)/64/.
+        

@@ -4,8 +4,8 @@
 This a a fork of the original AutoGate 1.72 that was abandoned 2017 with changes to make in usable on XP12.
 So the main goal is to just compile the plugin code for XP12.
 
-The only verified working part of the build system is *../src/Makefile.mgw64* for the mingw64 system on Windows.
-A linkable OpenAL32.dll was obtained as follows:
+The only verified working part of the build system is *../src/Makefile.mgw64* for the mingw64 system on Windows and *../src/Makefile.lin64* for Linux.
+A linkable OpenAL32.dll for Windows was obtained as follows:
 - get copy of libOpenAL32.dll e.g. from FlyWithLua
 - pick libOpenAL's *include/AL* header files, e.g. from the msys2 system
 - run within a mgw64 shell:

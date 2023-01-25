@@ -245,7 +245,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
         .drawWindowFunc = drawdebug,
         .decorateAsFloatingWindow = xplm_WindowDecorationRoundRectangle
     };
-               
+
     windowId = XPLMCreateWindowEx(&cw);
 #endif
 
@@ -370,6 +370,15 @@ static void resetidle(void)
     stopalert();
 }
 
+static int check_running(void)
+{
+    int running;
+    XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
+    running |= (XPLMGetDataf(ref_parkingbrake) < 0.5f);
+    running |= XPLMGetDatai(ref_beacon);
+    return running;
+}
+
 static float getgatefloat(XPLMDataRef inRefcon)
 {
     float now;
@@ -441,7 +450,6 @@ static float getgatefloat(XPLMDataRef inRefcon)
         {
             /* Fudge plane's position to line up with this gate */
             float object_hcos, object_hsin;
-            int running;
 
             object_hcos = cosf(object_h);
             object_hsin = sinf(object_h);
@@ -449,9 +457,7 @@ static float getgatefloat(XPLMDataRef inRefcon)
             XPLMSetDataf(ref_plane_z, plane_z - local_z * object_hcos - local_x * object_hsin);
             localpos(object_x, object_y, object_z, object_h, &local_x, &local_y, &local_z);	/* recalc */
 
-            XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
-            running |= (XPLMGetDataf(ref_parkingbrake) < 0.5f);
-            running |= XPLMGetDatai(ref_beacon);
+            int running = check_running();
             state = running ? TRACK : DOCKED;
         }
         else if (!door_x)
@@ -608,12 +614,8 @@ static int localpos(float object_x, float object_y, float object_z, float object
 /* Update published data used by gate and dgs */
 static void updaterefs(float now, float local_x, float local_y, float local_z)
 {
-    int running;
     int locgood=(fabsf(local_x)<=AZI_X && fabsf(local_z)<=GOOD_Z);
-
-    XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
-    running |= (XPLMGetDataf(ref_parkingbrake) < 0.5f);
-    running |= XPLMGetDatai(ref_beacon);
+    int running = check_running();
 
     status=id1=id2=id3=id4=lr=track=0;
     azimuth=distance=distance2=0;
@@ -806,10 +808,7 @@ static void drawdebug(XPLMWindowID inWindowID, void *inRefcon)
     int left, top, right, bottom;
     float color[] = { 1.0, 1.0, 1.0 };	/* RGB White */
     float pos[3], gain;
-    int running;
-    XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
-    running |= (XPLMGetDataf(ref_parkingbrake) < 0.5);
-    running |= XPLMGetDatai(ref_beacon);
+    int running = check_running();
 
     XPLMGetWindowGeometry(inWindowID, &left, &top, &right, &bottom);
 

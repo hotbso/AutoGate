@@ -55,7 +55,7 @@ int gate_autogate;				/* active gate is an AutoGate, not a standalone dummy */
 static float last_dgs_x, last_dgs_y, last_dgs_z;	/* last dgs object examined */
 static float last_dgs_update = 0;		/* and the time we examined it */
 static float dgs_x, dgs_y, dgs_z;		/* active DGS */
-
+static float beacon_on_ts;              /* most recent time beacon was on */
 
 /* In this file */
 static float newplanecallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
@@ -373,9 +373,26 @@ static void resetidle(void)
 static int check_running(void)
 {
     int running;
+    float now = XPLMGetDataf(ref_total_running_time_sec);
     XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
     running |= (XPLMGetDataf(ref_parkingbrake) < 0.5f);
-    running |= XPLMGetDatai(ref_beacon);
+
+    /* when checking the beacon guard against power transition when switching
+       to the APU generator (e.g. for thr ToLiss fleet.
+       Report only "OFF" when the last "ON" was at least a second ago */
+    int beacon = XPLMGetDatai(ref_beacon);
+    if (beacon)
+    {
+        beacon_on_ts = now; /* save time for ON */
+        running = 1;
+    }
+    else
+    {
+        /* check whether beacon is off for at least 1 sec */
+        if (now - beacon_on_ts < 1.0)
+            running = 1;    /* otherwise report on */
+    }
+
     return running;
 }
 

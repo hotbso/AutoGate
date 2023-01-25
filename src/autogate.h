@@ -32,7 +32,11 @@
 #  include <AL/alc.h>
 #endif
 
-#define XPLM200	/* Requires X-Plane 9.0 or later */
+#define XPLM200
+#define XPLM210
+#define XPLM300
+#define XPLM301
+
 #include "XPLMCamera.h"
 #include "XPLMDataAccess.h"
 #include "XPLMDisplay.h"

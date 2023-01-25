@@ -238,8 +238,17 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
     ref_distance2=floatref("marginal.org.uk/dgs/distance2", getdgsfloat, &distance2);
 
 #ifdef DEBUG
-    windowId = XPLMCreateWindow(10, 750, 310, 610, 1, drawdebug, NULL, NULL, NULL);
+    XPLMCreateWindow_t cw = {
+        .structSize = sizeof(XPLMCreateWindow_t),
+        .left = 10, .top = 750, .right = 310, .bottom = 600,
+        .visible = 1,
+        .drawWindowFunc = drawdebug,
+        .decorateAsFloatingWindow = xplm_WindowDecorationRoundRectangle
+    };
+               
+    windowId = XPLMCreateWindowEx(&cw);
 #endif
+
     XPLMRegisterFlightLoopCallback(initsoundcallback, -1, NULL);	/* Deferred initialisation */
     XPLMRegisterFlightLoopCallback(alertcallback, 0, NULL);
     XPLMRegisterFlightLoopCallback(newplanecallback, 0, NULL);		/* For checking gate alignment on new location */
@@ -800,9 +809,9 @@ static void drawdebug(XPLMWindowID inWindowID, void *inRefcon)
     int running;
     XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
     running |= (XPLMGetDataf(ref_parkingbrake) < 0.5);
+    running |= XPLMGetDatai(ref_beacon);
 
     XPLMGetWindowGeometry(inWindowID, &left, &top, &right, &bottom);
-    XPLMDrawTranslucentDarkBox(left, top, right, bottom);
 
     char *statestr[] = { "Disabled", "NewPlane", "Idle", "IDFail", "Track", "Good", "Bad", "Engage", "Docked", "Disengage", "Disengaged" };
     sprintf(buf, "State: %s %s %s", statestr[state], plane_type==15 ? "Unknown" : canonical[plane_type], running ? "Running" : "Parked");

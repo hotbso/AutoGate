@@ -27,7 +27,7 @@ static float door_x, door_y, door_z;		/* door offset relative to ref point */
 
 /* Datarefs */
 static XPLMDataRef ref_plane_x, ref_plane_y, ref_plane_z, ref_plane_psi;
-static XPLMDataRef ref_ENGN_running, ref_parkingbrake, ref_beacon;
+static XPLMDataRef ref_beacon;
 static XPLMDataRef ref_draw_object_x, ref_draw_object_y, ref_draw_object_z, ref_draw_object_psi;
 static XPLMDataRef ref_acf_descrip, ref_acf_icao;
 static XPLMDataRef ref_acf_cg_y, ref_acf_cg_z;
@@ -55,7 +55,7 @@ int gate_autogate;				/* active gate is an AutoGate, not a standalone dummy */
 static float last_dgs_x, last_dgs_y, last_dgs_z;	/* last dgs object examined */
 static float last_dgs_update = 0;		/* and the time we examined it */
 static float dgs_x, dgs_y, dgs_z;		/* active DGS */
-static float beacon_on_ts;              /* most recent time beacon was on */
+static float running_state, beacon_last_pos, beacon_off_ts, beacon_on_ts;  /* running state, last switch_pos, ts of last switch action */
 
 /* In this file */
 static float newplanecallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
@@ -201,8 +201,6 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc)
     ref_plane_y        =XPLMFindDataRef("sim/flightmodel/position/local_y");
     ref_plane_z        =XPLMFindDataRef("sim/flightmodel/position/local_z");
     ref_plane_psi      =XPLMFindDataRef("sim/flightmodel/position/psi");
-    ref_ENGN_running   =XPLMFindDataRef("sim/flightmodel/engine/ENGN_running");
-    ref_parkingbrake   =XPLMFindDataRef("sim/flightmodel/controls/parkbrake");
     ref_beacon         =XPLMFindDataRef("sim/cockpit2/switches/beacon_on");
     ref_draw_object_x  =XPLMFindDataRef("sim/graphics/animation/draw_object_x");
     ref_draw_object_y  =XPLMFindDataRef("sim/graphics/animation/draw_object_y");
@@ -368,32 +366,34 @@ static void resetidle(void)
     status=id1=id2=id3=id4=lr=track=0;
     azimuth=distance=distance2=0;
     stopalert();
+
+    running_state = beacon_last_pos = XPLMGetDatai(ref_beacon);
+    beacon_on_ts = beacon_off_ts = -10.0;
 }
 
-static int check_running(void)
+static int check_running()
 {
-    int running;
     float now = XPLMGetDataf(ref_total_running_time_sec);
-    XPLMGetDatavi(ref_ENGN_running, &running, 0, 1);
-    running |= (XPLMGetDataf(ref_parkingbrake) < 0.5f);
 
     /* when checking the beacon guard against power transition when switching
-       to the APU generator (e.g. for thr ToLiss fleet.
-       Report only "OFF" when the last "ON" was at least a second ago */
+       to the APU generator (e.g. for the ToLiss fleet.
+       Report only state transitions when the new state persisted for 3 seconds */
     int beacon = XPLMGetDatai(ref_beacon);
-    if (beacon)
-    {
-        beacon_on_ts = now; /* save time for ON */
-        running = 1;
-    }
-    else
-    {
-        /* check whether beacon is off for at least 1 sec */
-        if (now - beacon_on_ts < 1.0)
-            running = 1;    /* otherwise report on */
-    }
+    if (beacon) {
+        if (! beacon_last_pos) {
+            beacon_on_ts = now;
+            beacon_last_pos = 1;
+        } else if (now > beacon_on_ts + 3.0)
+            running_state = 1;
+    } else {
+        if (beacon_last_pos) {
+            beacon_off_ts = now;
+            beacon_last_pos = 0;
+        } else if (now > beacon_off_ts + 3.0)
+            running_state = 0;
+   }
 
-    return running;
+   return running_state;
 }
 
 static float getgatefloat(XPLMDataRef inRefcon)

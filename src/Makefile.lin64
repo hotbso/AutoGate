@@ -1,12 +1,17 @@
-PLUGINS=../../X-Plane/Resources/plugins/AutoGate
+PLUGINS=../../../../X-Plane-12/Resources/plugins/AutoGate
 SDK=../../SDK
+OBJDIR=./OBJ_lx
 
 include ../version.mak
 
 TARGET=lin.xpl
 HEADERS=$(wildcard *.h)
 SOURCES=$(wildcard *.c)
-OBJECTS=$(SOURCES:.c=.o)
+SOURCES_C=$(wildcard *.c)
+SOURCES_CPP=$(wildcard *.cpp)
+OBJECTS_=$(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o)
+OBJECTS=$(addprefix $(OBJDIR)/, $(OBJECTS_))
+$(info $(OBJECTS))
 
 CFLAGS=-Wall -I$(SDK)/CHeaders/XPLM -fPIC -DLIN=1 -fno-stack-protector \
        -DVERSION=\"$(VERSION)\"
@@ -14,18 +19,18 @@ CFLAGS=-Wall -I$(SDK)/CHeaders/XPLM -fPIC -DLIN=1 -fno-stack-protector \
 
 LNFLAGS=-shared -rdynamic -nodefaultlibs -undefined_warning
 LIBS=-lopenal
-#-fvisibility=hidden -Wl,-exported_symbols_list -Wl,linkscript.mac
 
 all: $(TARGET)
+    $(shell [ -d $(OBJDIR) ] || mkdir $(OBJDIR))
 
-.c.o:$(HEADERS)
+$(OBJDIR)/%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(TARGET): $(OBJECTS)
 	$(CC) -o $(TARGET) $(LNFLAGS) $(OBJECTS) $(LIBS)
 
 clean:
-	rm -f $(OBJECTS) $(LACFU_OBJECTS) $(TARGET)
+	rm -f $(OBJECTS) $(TARGET)
 
 install: $(TARGET)
 	cp -p $(TARGET) $(PLUGINS)/64/.

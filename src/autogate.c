@@ -817,6 +817,15 @@ int xplog(char *msg)
     return 0;
 }
 
+/* Convert path to posix style in-place */
+void posixify(char *path)
+{
+#if IBM
+    char *c;
+    for (c=path; *c; c++) if (*c=='\\') *c='/';
+#endif
+}
+
 
 #ifdef DEBUG
 static void drawdebug(XPLMWindowID inWindowID, void *inRefcon)

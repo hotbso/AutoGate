@@ -24,12 +24,14 @@
 #  define strcasecmp(s1, s2) _stricmp(s1, s2)
 #endif
 
+#ifndef NO_OPENAL
 #if APL
 #  include <OpenAL/al.h>
 #  include <OpenAL/alc.h>
 #else
 #  include <AL/al.h>
 #  include <AL/alc.h>
+#endif
 #endif
 
 #define XPLM200

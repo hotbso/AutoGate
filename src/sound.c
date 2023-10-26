@@ -11,10 +11,17 @@
 
 #include "autogate.h"
 
-#if APL
-#  include <CoreFoundation/CFString.h>
-#  include <CoreFoundation/CFURL.h>
-#endif
+#ifdef NO_OPENAL
+XPLMDataRef ref_audio, ref_paused, ref_view_external;
+float initsoundcallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon)
+{ return 0.0; }
+
+float alertcallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) { return 0; }
+void closesound() { return; }
+void playalert() { return; }
+void stopalert() { return; }
+
+#else
 
 /* Globals */
 #ifdef MAKECONTEXT	/* We have to make our own device and context on Windows under X-Plane <10.2 */
@@ -201,31 +208,6 @@ ALuint load_wave(const char *file_name)
 }
 
 #undef FAIL
-
-
-/* Convert path to posix style in-place */
-void posixify(char *path)
-{
-#if APL
-    if (*path!='/')
-    {
-        /* X-Plane 9 - screw around with HFS paths FFS */
-        int isfolder = (path[strlen(path)-1]==':');
-        CFStringRef hfspath = CFStringCreateWithCString(NULL, path, kCFStringEncodingMacRoman);
-        CFURLRef url = CFURLCreateWithFileSystemPath(NULL, hfspath, kCFURLHFSPathStyle, 0);
-        CFStringRef posixpath = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
-        CFStringGetCString(posixpath, path, PATH_MAX, kCFStringEncodingUTF8);
-        CFRelease(hfspath);
-        CFRelease(url);
-        CFRelease(posixpath);
-        if (isfolder && path[strlen(path)-1]!='/') { strcat(path, "/"); }	/* converting from HFS loses trailing separator */
-    }
-#elif IBM
-    char *c;
-    for (c=path; *c; c++) if (*c=='\\') *c='/';
-#endif
-}
-
 
 #define CHECKERR(msg) { ALuint e = alGetError(); if (e != AL_NO_ERROR) return xplog(msg); }
 
@@ -467,3 +449,4 @@ float alertcallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFl
 #endif
     return -2;	/* Every other frame should be plenty */
 }
+#endif

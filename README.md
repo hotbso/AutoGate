@@ -1,9 +1,14 @@
 # AutoGate animated jetway and docking guidance system kit
 
-### Note
-This a a fork of the original AutoGate 1.72 that was abandoned 2017 with changes to make in usable on XP12.
+## Note
+This a a fork of the original AutoGate 1.72 that was abandoned 2017 with changes to make in usable on XP12.\
 So the main goal is to just compile the plugin code for XP12.
 
+Versioning starts with 1.80.
+
+Download: https://github.com/hotbso/AutoGate/releases
+
+### Hints for developers
 The only verified working part of the build system is *../src/Makefile.mgw64* for the mingw64 system on Windows and *../src/Makefile.lin64* for Linux.
 A linkable OpenAL32.dll for Windows was obtained as follows:
 - get copy of libOpenAL32.dll e.g. from FlyWithLua
@@ -15,7 +20,7 @@ dlltool -d OpenAL32.def -D OpenAL32.dll -k -a -l libopenal32.a -v
 ```
 - link against libopenal32.a and put OpenAL32.dll into the plugin
 
-### Original README
+## Original README
 This kit allows [X-Plane](http://www.x-plane.com/) scenery designers to add animated jetways and docking guidance systems (DGS) to scenery packages. Two types of jetway and four types of DGS are included.
  
 The jetway animates to dock with the plane's main door when the pilot shuts down the plane's engines with the plane within ½m of the correct stopping position. The DGS guides the pilot to the correct stopping position.

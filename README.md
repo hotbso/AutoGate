@@ -8,6 +8,8 @@ Versioning starts with 1.80.
 
 Download: https://github.com/hotbso/AutoGate/releases
 
+Support is only on discord: https://discord.gg/6WBfRbrH5H
+
 ### Hints for developers
 The only verified working part of the build system is *../src/Makefile.mgw64* for the mingw64 system on Windows and *../src/Makefile.lin64* for Linux.
 A linkable OpenAL32.dll for Windows was obtained as follows:
